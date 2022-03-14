@@ -2,6 +2,8 @@ import * as React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { EditButton } from "./UI/EditButton";
+import { PathInEditMode } from "./PenTool/PathInEditMode";
+import { useEffect } from "react";
 
 export function Scene() {
   return (
@@ -11,6 +13,7 @@ export function Scene() {
       <pointLight position={[10, 10, 10]} />
       <OrbitControls />
       <EditButton position={[-3.5, 3.5, 0]} />
+      <PathInEditMode />
     </Canvas>
   );
 }
