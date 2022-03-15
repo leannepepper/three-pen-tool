@@ -7,15 +7,15 @@ import { useEffect } from "react";
 import { EditingContext } from "./context";
 
 export function Scene() {
-  const [isEditing, setIsEditing] = React.useState(false);
+  const [isEditing, setIsEditing] = React.useState(true);
   return (
     <Canvas>
       <color attach="background" args={["#000"]} />
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-      <OrbitControls />
+      {/* <OrbitControls /> */}
       <EditingContext.Provider value={[isEditing, setIsEditing]}>
-        <EditButton position={[-3.5, 3.5, 0]} />
+        {/* <EditButton position={[-3.5, 3.5, 0]} /> */}
         <PathInEditMode />
       </EditingContext.Provider>
     </Canvas>
