@@ -14,7 +14,7 @@ export function EditButton(props: any) {
       {([isEditing, setIsEditing]) => (
         <Html {...props}>
           <button
-            onClick={() => {
+            onMouseDown={() => {
               setIsEditing(!isEditing);
             }}
             type="button"
