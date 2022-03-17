@@ -5,9 +5,11 @@ import { EditButton } from "./UI/EditButton";
 import { PathInEditMode } from "./PenTool/PathInEditMode";
 import { useEffect } from "react";
 import { EditingContext } from "./context";
+import THREE from "three";
 
 export function Scene() {
   const [isEditing, setIsEditing] = React.useState(true);
+
   return (
     <Canvas>
       <color attach="background" args={["#000"]} />
@@ -16,6 +18,7 @@ export function Scene() {
       {/* <OrbitControls /> */}
       <EditingContext.Provider value={[isEditing, setIsEditing]}>
         {/* <EditButton position={[-3.5, 3.5, 0]} /> */}
+
         <PathInEditMode />
       </EditingContext.Provider>
     </Canvas>
