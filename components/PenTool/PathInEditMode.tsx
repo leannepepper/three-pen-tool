@@ -6,7 +6,7 @@ import { VectorNode } from "./VectorNode";
 
 function Line({ points }: { points: THREE.Vector3[] }) {
   const lineRef = useRef(null);
-  const geometry = createBufferGeometry({ points });
+  const geometry = createPath(points);
 
   useEffect(() => {
     lineRef.current.geometry = geometry;
@@ -20,20 +20,30 @@ function Line({ points }: { points: THREE.Vector3[] }) {
   );
 }
 
-function createBufferGeometry({ points }: { points: THREE.Vector3[] }) {
-  const geometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(points.length * 3);
-  const indices = new Uint16Array(points.length);
+function closePath(points: THREE.Vector3[]) {
+  const lastPoint = points[points.length - 1];
+  const firstPoint = points[0];
+  if (lastPoint.distanceTo(firstPoint) > 0.1) {
+    points.push(firstPoint);
+  }
+  return firstPoint;
+}
 
-  for (let i = 0; i < points.length; i++) {
-    positions[i * 3] = points[i].x;
-    positions[i * 3 + 1] = points[i].y;
-    positions[i * 3 + 2] = points[i].z;
-    indices[i] = i;
+function createPath(points: THREE.Vector3[]) {
+  const path = new THREE.Path();
+  path.moveTo(points[0].x, points[0].y);
+
+  const lastPoint = points[points.length - 1];
+  for (let i = 1; i < points.length; i++) {
+    path.lineTo(points[i].x, points[i].y);
+
+    if (points[i] === lastPoint) {
+      path.lineTo(points[0].x, points[0].y);
+    }
   }
 
-  // geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const pathPoints = path.getPoints();
+  const geometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
   return geometry;
 }
 
