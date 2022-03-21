@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export function createPath(points: THREE.Vector3[]) {
+export function createPath(points: THREE.Vector3[], isClosed: boolean) {
   const path = new THREE.Path();
   path.moveTo(points[0].x, points[0].y);
 

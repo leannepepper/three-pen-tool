@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function VectorNode({
   point,
-  onClick,
+  ...props
 }: {
   point: THREE.Vector3;
   onClick: (point: THREE.Vector3) => void;
@@ -16,16 +16,20 @@ export function VectorNode({
 
   return (
     <group
+      {...props}
       ref={vectorNodeRef}
       position={point}
       onClick={() => {
-        onClick(point);
+        props.onClick(point);
+      }}
+      onPointerOver={() => {
+        setHover(true);
+      }}
+      onPointerOut={() => {
+        setHover(false);
       }}
     >
-      <mesh
-        onPointerOver={(event) => setHover(true)}
-        onPointerOut={(event) => setHover(false)}
-      >
+      <mesh>
         <circleBufferGeometry args={[0.05, 50]} />
         <meshBasicMaterial color={hovered ? "deeppink" : "orange"} />
       </mesh>
