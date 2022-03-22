@@ -1,44 +1,17 @@
 import { useThree } from "@react-three/fiber";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as THREE from "three";
 import { EditingContext } from "../context";
-import { createPath } from "./pathUtils";
+import { Line } from "./Line";
 import { getRealMouseCoordinates } from "./utils";
 import { VectorNode } from "./VectorNode";
-
-function Line({
-  points,
-  isClosed,
-}: {
-  points: THREE.Vector3[];
-  isClosed: boolean;
-}) {
-  const lineRef = useRef(null);
-  const path = createPath(points, isClosed);
-
-  if (isClosed) path.closePath();
-
-  const pathPoints = path.getPoints();
-  const geometry = new THREE.BufferGeometry().setFromPoints(pathPoints);
-
-  useEffect(() => {
-    lineRef.current.geometry = geometry;
-  }, [points]);
-
-  return (
-    <line ref={lineRef}>
-      <bufferGeometry />
-      <lineBasicMaterial color="deeppink" />
-    </line>
-  );
-}
 
 export function PathInEditMode() {
   const { camera } = useThree();
   const [isEditing] = useContext(EditingContext);
 
-  const [isClosed, setClosed] = useState(false);
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
+  const [isClosed, setClosed] = useState(false);
 
   function handleClick(e: MouseEvent) {
     e.preventDefault();
@@ -55,6 +28,10 @@ export function PathInEditMode() {
     }
   }
 
+  function updateVectorNode(point: THREE.Vector3, index: number) {
+    setPoints([...points.slice(0, index), point, ...points.slice(index + 1)]);
+  }
+
   useEffect(() => {
     window.addEventListener("click", handleClick);
 
@@ -66,7 +43,12 @@ export function PathInEditMode() {
   return (
     <group>
       {points.map((point, index) => (
-        <VectorNode key={index} point={point} onClick={(point) => {}} />
+        <VectorNode
+          key={index}
+          index={index}
+          point={point}
+          updateVectorNode={updateVectorNode}
+        />
       ))}
       {points.length > 1 && !isClosed && (
         <Line points={points} isClosed={isClosed} />
