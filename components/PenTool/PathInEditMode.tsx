@@ -2,7 +2,7 @@ import { useThree } from "@react-three/fiber";
 import { useContext, useEffect, useState } from "react";
 import * as THREE from "three";
 import { EditingContext } from "../context";
-import { Line } from "./Line";
+import { CustomMesh } from "./Line";
 import { getRealMouseCoordinates } from "./utils";
 import { VectorNode } from "./VectorNode";
 
@@ -50,12 +50,7 @@ export function PathInEditMode() {
           updateVectorNode={updateVectorNode}
         />
       ))}
-      {points.length > 1 && !isClosed && (
-        <Line points={points} isClosed={isClosed} />
-      )}
-      {points.length > 1 && isClosed && (
-        <Line points={points} isClosed={isClosed} />
-      )}
+      {points.length > 1 && <CustomMesh points={points} />}
     </group>
   );
 }
