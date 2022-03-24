@@ -1,10 +1,16 @@
 import { useThree } from "@react-three/fiber";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 import * as THREE from "three";
 import { EditingContext } from "../context";
 import { CustomMesh } from "./Line";
 import { getRealMouseCoordinates } from "./utils";
 import { VectorNode } from "./VectorNode";
+
+export type CursorType = "default" | "pointer" | "move" | "crosshair" | "grab";
+
+function cursorReducer(state: CursorType, action: { type: CursorType }) {
+  return action.type;
+}
 
 export function PathInEditMode() {
   const { camera } = useThree();
@@ -12,8 +18,11 @@ export function PathInEditMode() {
 
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
   const [isClosed, setClosed] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
+  const [pointIndexToMove, setPointIndexToMove] = useState<number | null>(null);
+  const [cursor, dispatchCursor] = useReducer(cursorReducer, "default");
 
-  function handleClick(e: MouseEvent) {
+  function handlePointerDown(e: PointerEvent) {
     e.preventDefault();
     const mouseCoordinates = getRealMouseCoordinates(e, camera);
     const newPoint = new THREE.Vector3(
@@ -21,10 +30,40 @@ export function PathInEditMode() {
       mouseCoordinates.y,
       0
     );
-    if (points.length > 1 && newPoint.distanceTo(points[0]) < 0.051) {
-      setClosed(true);
-    } else if (isEditing && !isClosed) {
+
+    points.forEach((point, index) => {
+      if (point.distanceTo(newPoint) < 0.051) {
+        dispatchCursor({ type: "move" });
+        setIsMoving(true);
+        setPointIndexToMove(index);
+        return;
+      }
+    });
+
+    if (
+      points.filter((point) => point.distanceTo(newPoint) < 0.051).length === 0
+    ) {
       setPoints([...points, newPoint]);
+    }
+  }
+
+  function handlePointerUp(e: PointerEvent) {
+    e.preventDefault();
+    dispatchCursor({ type: "default" });
+    setIsMoving(false);
+    setPointIndexToMove(null);
+  }
+
+  function handlePointerMove(e: PointerEvent) {
+    e.preventDefault();
+    if (isMoving) {
+      const mouseCoordinates = getRealMouseCoordinates(e, camera);
+      const newPoint = new THREE.Vector3(
+        mouseCoordinates.x,
+        mouseCoordinates.y,
+        0
+      );
+      updateVectorNode(newPoint, pointIndexToMove);
     }
   }
 
@@ -33,22 +72,24 @@ export function PathInEditMode() {
   }
 
   useEffect(() => {
-    window.addEventListener("click", handleClick);
+    document.body.style.cursor = cursor;
+  }, [cursor]);
 
+  useEffect(() => {
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointermove", handlePointerMove);
     return () => {
-      window.removeEventListener("click", handleClick);
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointermove", handlePointerMove);
     };
-  }, [points, isEditing, isClosed]);
+  }, [points, isMoving]);
 
   return (
     <group>
       {points.map((point, index) => (
-        <VectorNode
-          key={index}
-          index={index}
-          point={point}
-          updateVectorNode={updateVectorNode}
-        />
+        <VectorNode key={index} point={point} />
       ))}
       {points.length > 1 && <CustomMesh points={points} />}
     </group>

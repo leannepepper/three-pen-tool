@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { createPath } from "./pathUtils";
 
 export function CustomMesh({ points }: { points: THREE.Vector3[] }) {
+  // console.log("CustomMesh", points);
   const meshRef = useRef(null);
   const geometry = new THREE.BufferGeometry();
 
@@ -32,7 +33,7 @@ export function CustomMesh({ points }: { points: THREE.Vector3[] }) {
 
   return (
     <mesh ref={meshRef}>
-      <meshBasicMaterial color="deeppink" />
+      <meshBasicMaterial color={new THREE.Color("rgb(25,25,25)")} />
     </mesh>
   );
 }
