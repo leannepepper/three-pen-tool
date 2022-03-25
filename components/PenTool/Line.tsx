@@ -38,6 +38,37 @@ export function CustomMesh({ points }: { points: THREE.Vector3[] }) {
   );
 }
 
+export function CustomExtrudeMesh({ points }: { points: THREE.Vector3[] }) {
+  const meshRef = useRef(null);
+  const shape = new THREE.Shape();
+
+  shape.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) {
+    shape.lineTo(points[i].x, points[i].y);
+  }
+
+  const extrudeSettings = {
+    depth: 0,
+    bevelEnabled: false,
+    bevelSegments: 2,
+    steps: 2,
+    bevelSize: 0,
+    bevelThickness: 0,
+  };
+
+  const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+  useEffect(() => {
+    meshRef.current.geometry = geometry;
+  });
+
+  return (
+    <mesh ref={meshRef}>
+      <meshBasicMaterial color={new THREE.Color("rgb(25,25,25)")} />
+    </mesh>
+  );
+}
+
 export function Line({
   points,
   isClosed,

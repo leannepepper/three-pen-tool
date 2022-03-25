@@ -1,10 +1,11 @@
 import { useThree } from "@react-three/fiber";
-import { useContext, useEffect, useReducer, useState } from "react";
+import { useContext, useEffect, useReducer, useRef, useState } from "react";
 import * as THREE from "three";
 import { EditingContext } from "../context";
-import { CustomMesh } from "./Line";
+import { CustomExtrudeMesh, CustomMesh } from "./Line";
 import { getRealMouseCoordinates } from "./utils";
 import { VectorNode } from "./VectorNode";
+import { OrbitControls } from "@react-three/drei";
 
 export type CursorType = "default" | "pointer" | "move" | "crosshair" | "grab";
 
@@ -21,6 +22,7 @@ export function PathInEditMode() {
   const [isMoving, setIsMoving] = useState(false);
   const [pointIndexToMove, setPointIndexToMove] = useState<number | null>(null);
   const [cursor, dispatchCursor] = useReducer(cursorReducer, "default");
+  const controlsRef = useRef(null);
 
   function handlePointerDown(e: PointerEvent) {
     e.preventDefault();
@@ -72,6 +74,12 @@ export function PathInEditMode() {
   }
 
   useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.enabled = !isMoving;
+    }
+  }, [isMoving]);
+
+  useEffect(() => {
     document.body.style.cursor = cursor;
   }, [cursor]);
 
@@ -87,11 +95,15 @@ export function PathInEditMode() {
   }, [points, isMoving]);
 
   return (
-    <group>
-      {points.map((point, index) => (
-        <VectorNode key={index} point={point} />
-      ))}
-      {points.length > 1 && <CustomMesh points={points} />}
-    </group>
+    <>
+      <OrbitControls ref={controlsRef} />
+      <group>
+        {points.map((point, index) => (
+          <VectorNode key={index} point={point} />
+        ))}
+        {/* {points.length > 1 && <CustomMesh points={points} />} */}
+        {points.length > 1 && <CustomExtrudeMesh points={points} />}
+      </group>
+    </>
   );
 }
