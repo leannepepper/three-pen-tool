@@ -2,7 +2,7 @@ import { useThree } from "@react-three/fiber";
 import { useContext, useEffect, useReducer, useRef, useState } from "react";
 import * as THREE from "three";
 import { EditingContext } from "../context";
-import { CustomExtrudeMesh, CustomMesh, Line } from "./Line";
+import { ExtrudeMesh } from "./ExtrudeMesh";
 import { getRealMouseCoordinates } from "./utils";
 import { VectorNode } from "./VectorNode";
 import { OrbitControls } from "@react-three/drei";
@@ -96,14 +96,12 @@ export function PathInEditMode() {
 
   return (
     <>
-      <OrbitControls ref={controlsRef} />
+      {/* <OrbitControls ref={controlsRef} /> */}
       <group>
         {points.map((point, index) => (
           <VectorNode key={index} point={point} />
         ))}
-        {/* {points.length > 1 && <CustomMesh points={points} />} */}
-        {/* {points.length > 1 && <CustomExtrudeMesh points={points} />} */}
-        {points.length > 1 && <Line points={points} isClosed />}
+        {points.length > 1 && <ExtrudeMesh points={points} isClosed />}
       </group>
     </>
   );
