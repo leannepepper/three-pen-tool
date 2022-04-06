@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
-export function VectorNode({ point, ...props }: { point: THREE.Vector3 }) {
+export function VectorNode({
+  point,
+  size = 0.06,
+  ...props
+}: {
+  point: THREE.Vector3;
+  size?: number;
+}) {
   const [hovered, setHover] = useState(false);
   const vectorNodeRef = useRef(null);
 
@@ -21,7 +28,7 @@ export function VectorNode({ point, ...props }: { point: THREE.Vector3 }) {
       }}
     >
       <mesh>
-        <circleBufferGeometry args={[0.06, 50]} />
+        <circleBufferGeometry args={[size, 10]} />
         <meshBasicMaterial color={hovered ? "deeppink" : "orange"} />
       </mesh>
     </group>

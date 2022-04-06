@@ -15,10 +15,10 @@ export function Path({
   path.moveTo(points[0].x, points[0].y);
   points.forEach((point) => {
     path.bezierCurveTo(
-      point.x + 0.5,
-      point.y + 0.5,
-      point.x + 0.5,
-      point.y + 0.5,
+      point.x + 1,
+      point.y + 1,
+      point.x + 1,
+      point.y + 1,
       point.x,
       point.y
     );
@@ -34,18 +34,35 @@ export function Path({
   return (
     <>
       {path.curves.map((curve, index) => {
-        console.log({ curve });
+        // Create curve handels based off control points https://threejs.org/docs/?q=curve#api/en/extras/curves/CubicBezierCurve
 
-        let curvePoints = [
+        let firstControlPoint = [
           new THREE.Vector3(curve["v0"].x, curve["v0"].y, 0),
           new THREE.Vector3(curve["v1"].x, curve["v1"].y, 0),
+        ];
 
-          // new THREE.Vector3(curve["v2"].x, curve["v2"].y, 0),
-          // new THREE.Vector3(curve["v3"].x, curve["v3"].y, 0),
+        let secondControlPoint = [
+          new THREE.Vector3(curve["v2"].x, curve["v2"].y, 0),
+          new THREE.Vector3(curve["v3"].x, curve["v3"].y, 0),
         ];
 
         return (
-          <Line key={index} points={curvePoints} color="red" lineWidth={1} />
+          <>
+            <Line
+              key={index}
+              points={firstControlPoint}
+              color="blue"
+              lineWidth={1}
+            />
+            <VectorNode point={firstControlPoint[1]} size={0.04} />
+            <Line
+              key={index}
+              points={secondControlPoint}
+              color="red"
+              lineWidth={1}
+            />
+            <VectorNode point={secondControlPoint[0]} size={0.04} />
+          </>
         );
       })}
       <line>
