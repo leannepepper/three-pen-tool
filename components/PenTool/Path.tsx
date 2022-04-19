@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 import { ControlPoint } from "./ControlPoint";
 
@@ -33,25 +33,40 @@ export function Path({
 
   const pathPoints = path.getPoints();
 
-  const controlPointObjs: ControlPointObj[] = path.curves.map(
-    (curve, index) => {
-      const firstControlPoint = [
-        new THREE.Vector3(curve["v0"].x, curve["v0"].y, 0),
-        new THREE.Vector3(curve["v1"].x, curve["v1"].y, 0),
-      ];
+  const controlPointObjs: ControlPointObj[] = useMemo(
+    () =>
+      path.curves.map((curve, index) => {
+        const firstControlPoint = [
+          new THREE.Vector3(curve["v0"].x, curve["v0"].y, 0),
+          new THREE.Vector3(curve["v1"].x, curve["v1"].y, 0),
+        ];
 
-      const secondControlPoint = [
-        new THREE.Vector3(curve["v2"].x, curve["v2"].y, 0),
-        new THREE.Vector3(curve["v3"].x, curve["v3"].y, 0),
-      ];
-      return { curve, firstControlPoint, secondControlPoint, index };
-    }
+        const secondControlPoint = [
+          new THREE.Vector3(curve["v2"].x, curve["v2"].y, 0),
+          new THREE.Vector3(curve["v3"].x, curve["v3"].y, 0),
+        ];
+
+        return { curve, firstControlPoint, secondControlPoint, index };
+      }),
+    [pathPoints, points]
   );
+
+  function updateControlPoints(geometry: THREE.BufferGeometry) {
+    //  const positions = geometry.attributes.position;
+    //  const points = getPathPoints(positions)[1]
+  }
 
   const onUpdatePath = useCallback(
-    (self) => self.setFromPoints(pathPoints),
-    [pathPoints]
+    (self) => {
+      self.setFromPoints(pathPoints);
+      updateControlPoints(self);
+    },
+    [pathPoints, points]
   );
+
+  const updateControlPoint = useCallback((newPoint) => {
+    //   console.log("UpdateControlPoint", path.curves);
+  }, []);
 
   return (
     <>
@@ -59,13 +74,15 @@ export function Path({
         <>
           <ControlPoint
             key={index + 1}
-            point={new THREE.Vector3(obj.curve["v1"].x, obj.curve["v1"].y, 0)}
+            point={obj.firstControlPoint[1]}
             size={0.04}
+            updateControlPoint={updateControlPoint}
           />
           <ControlPoint
             key={index + 2}
-            point={new THREE.Vector3(obj.curve["v2"].x, obj.curve["v2"].y, 0)}
+            point={obj.secondControlPoint[0]}
             size={0.04}
+            updateControlPoint={updateControlPoint}
           />
         </>
       ))}

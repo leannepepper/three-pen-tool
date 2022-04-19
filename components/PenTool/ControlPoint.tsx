@@ -5,10 +5,12 @@ import { getRealMouseCoordinates } from "./utils";
 
 export function ControlPoint({
   point,
+  updateControlPoint,
   size = 0.06,
   ...props
 }: {
   point: THREE.Vector3;
+  updateControlPoint: (point: THREE.Vector3) => void;
   size?: number;
 }) {
   const [hovered, setHover] = useState(false);
@@ -50,6 +52,7 @@ export function ControlPoint({
         0
       );
       setCurrentPoint(newPoint);
+      updateControlPoint(newPoint);
     }
   }
 
